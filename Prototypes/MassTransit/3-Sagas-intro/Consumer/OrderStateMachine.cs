@@ -25,32 +25,30 @@ namespace Consumer
         public OrderStateMachine()
         {
             // What property represents curent State?
-            InstanceState(x => x.CurrentState, Submitted, Accepted);
+            InstanceState(x => x.CurrentState, Submitted, Complete);
 
             // How to find an Instance when we receive an Event? we correlate by OrderId
-            Event(() => SubmitOrder, x => x.CorrelateById(context => context.Message.OrderId));
+            Event(() => SubmitExpenseReport, x => x.CorrelateById(context => context.Message.OrderId));
 
             // state transitions declaration (behavior)
             Initially(
-                When(SubmitOrder)
-                    .TransitionTo(Submitted),
-                When(OrderAccepted)
-                    .TransitionTo(Accepted));
+                When(SubmitExpenseReport)
+                    .TransitionTo(Submitted));
 
             During(Submitted, 
-                When(OrderAccepted)
-                    .TransitionTo(Accepted));
+                When(ExpenseReportProcessed)
+                    .TransitionTo(Complete));
 
-            During(Accepted, Ignore(SubmitOrder));
+            During(Complete, Ignore(SubmitExpenseReport));
         }
 
         // Available states declaration
         public State Submitted { get; private set; }
-        public State Accepted { get; private set; }
+        public State Complete { get; private set; }
 
 
         // Events declaration which affect state
-        public Event<SubmitOrder> SubmitOrder { get; private set; }
+        public Event<SubmitOrder> SubmitExpenseReport { get; private set; }
         public Event<SubmitOrder> OrderAccepted { get; private set; }
     }
 }
